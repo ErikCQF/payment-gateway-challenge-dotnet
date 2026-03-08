@@ -15,4 +15,25 @@ docker-compose.yml - configures the bank simulator
 PaymentGateway.sln
 ```
 
-Feel free to change the structure of the solution, use a different test library etc.
+
+# Payment Gateway: Responsible for validating requests, storing card information and forwarding payment requests and accepting payment responses to and from the acquiring bank.
+
+#    Services/
+#       PaymentGatewayService::IPaymentGateway
+     
+# Acquiring Bank: Allows us to do the actual retrieval of money from the shopper’s card and pay out to the merchant. It also performs some validation of the card information and then sends the payment details to the  appropriate 3rd party organization for processing.
+
+#    Infrastructure/
+#       Banks/
+#           AcquiringBank::IAcquiringBank
+
+
+# **** Notice that it does not call IAcquiringBank if the validation has failed.
+
+# Validator: any new rule, just implement the interface
+#   Infrastructure/
+#       Validators/
+#           Rules/
+#             IValidateRule
+
+
