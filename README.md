@@ -33,7 +33,7 @@ Infrastructure/
 ```
 > `IAcquiringBank` is never called if validation has failed — this is a hard spec requirement.
 
-**Validator** — chain of responsibility pattern. Each rule is independent and isolated. To add a new rule, implement `IValidateRule` and register it in `Program.cs` — no other changes needed.
+**Validator** — Each rule is independent and isolated. To add a new rule, implement `IValidateRule` and register it in `Program.cs` — no other changes needed.
 ```
 Infrastructure/
               Validators/
