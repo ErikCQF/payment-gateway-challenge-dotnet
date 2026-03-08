@@ -55,5 +55,23 @@ namespace PaymentGateway.Api.Tests
             //Assert
             Assert.Equal(PaymentStatus.Authorized, result.Status);
         }
+
+        [Fact]
+        public async Task Authorized_bank_response_returns_non_authorized_status()
+        {
+            //Arrange
+            _validatorMock
+             .Setup(v => v.Validate(It.IsAny<ProcessPaymentRequest>()))
+             .Returns(new ProcessPaymentResponse(true, "Valid"));
+            _bankMock
+                .Setup(b => b.ProcessPaymentAsync(It.IsAny<BankRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BankResponse(false, "auth-123"));
+
+            //Act
+            var result = await _paymentGateway.ProcessAsync(ValidRequest);
+
+            //Assert
+            Assert.Equal(PaymentStatus.Declined, result.Status);
+        }
     }
 }
