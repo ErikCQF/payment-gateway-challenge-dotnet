@@ -33,14 +33,14 @@ public class PaymentsController : Controller
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(PostPaymentResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(PostPaymentResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<PostPaymentResponse?>> ProcessPayment([FromBody] ProcessPaymentRequest request,
+    [ProducesResponseType(typeof(BankResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BankResponse), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<BankResponse?>> ProcessPayment([FromBody] PostPaymentRequestModel request,
                                                     CancellationToken cancellationToken)
     {
-        var result = await _paymentGateway.ProcessAsync(request, cancellationToken);
+        var result = await _paymentGateway.ProcessAsync(request.ToProcessPaymentRequest(), cancellationToken);
         return result.Status == PaymentStatus.Rejected
-                ? UnprocessableEntity(result)
-                : Ok(result);
+                ? UnprocessableEntity(result.ToPostPaymentResponse())
+                : Ok(result.ToPostPaymentResponse());
     }
 }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 using Microsoft.AspNetCore.Diagnostics;
 
 using PaymentGateway.Api.Infrastructure.Helpers;
@@ -9,13 +11,20 @@ using PaymentGateway.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
+//From the spec it was requiring to export as Declined/Authorised/Rejected
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//existents services
 builder.Services.AddSingleton<PaymentsRepository>();
+
+//Infra structure Services
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 builder.Services.AddSingleton<IPaymentsRepository, PaymentsRepositoryProxy>();
 builder.Services.AddSingleton<IValidatorService, ValidatorService>();
@@ -24,13 +33,13 @@ builder.Services.AddSingleton<IValidateRule, ValidateCardNumber>();
 builder.Services.AddSingleton<IValidateRule, ValidateCvv>();
 builder.Services.AddSingleton<IValidateRule, ValidateExpiry>();
 builder.Services.AddSingleton<IValidateRule, ValidateCurrency>();
-builder.Services.AddSingleton<IPaymentGateway, PaymentGatewayService>();
 builder.Services.AddHttpClient<IAcquiringBank, AcquiringBank>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["BankSimulator:BaseUrl"]!);
     client.Timeout = TimeSpan.FromSeconds(10);
 });
-
+//Payment Orchestrator: the Payment gateway
+builder.Services.AddSingleton<IPaymentGateway, PaymentGatewayService>();
 
 var app = builder.Build();
 

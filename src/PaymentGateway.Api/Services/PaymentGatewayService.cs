@@ -34,10 +34,13 @@ namespace PaymentGateway.Api.Services
             var paymentId = Guid.NewGuid();
 
             var validation = _validatorService.Validate(request);
-            //Dont save if rejected-from spec
+
             if (!validation.IsValid)
             {
-                return BuildResponse(paymentId, request, lastFourInt, PaymentStatus.Rejected);
+                var invaliResponse = BuildResponse(paymentId, request, lastFourInt, PaymentStatus.Rejected);
+                _paymentsRepository.Add(invaliResponse);
+
+                return invaliResponse;
             }
             BankRequest bankRequest = BuildBankRequest(request);
 
