@@ -12,12 +12,17 @@ namespace PaymentGateway.Api.Infrastructure.Validators.Rules
 
         public ProcessPaymentResponse Validate(ProcessPaymentRequest request)
         {
-            if (_supportedCurrencies.Contains(request.Currency!))
+            if (string.IsNullOrWhiteSpace(request.Currency))
             {
-                return new ProcessPaymentResponse(true, string.Empty);
+                return new ProcessPaymentResponse(false, "Currency is required.");
             }
 
-            return new ProcessPaymentResponse(false, nameof(ValidateCurrency));
+            if (!_supportedCurrencies.Contains(request.Currency))
+            {
+                return new ProcessPaymentResponse(false, "Currency must be one of: GBP, USD, EUR.");
+            }
+
+            return new ProcessPaymentResponse(true, string.Empty);
         }
     }
 }

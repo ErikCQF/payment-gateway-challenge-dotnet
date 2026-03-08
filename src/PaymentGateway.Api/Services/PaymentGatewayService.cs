@@ -41,7 +41,7 @@ namespace PaymentGateway.Api.Services
                 //from spec: Rejected - No payment could be created as invalid information was supplied to the payment gateway
                 //and therefore it has rejected the request without calling the acquiring bank
                 //No need to save in the repository
-                return BuildResponse(Guid.Empty, request, lastFourInt, PaymentStatus.Rejected);
+                return BuildResponse(null, request, lastFourInt, PaymentStatus.Rejected);
 
             }
 
@@ -62,26 +62,7 @@ namespace PaymentGateway.Api.Services
             _paymentsRepository.Add(response);
 
             return response;
-            //}
-            //catch (HttpRequestException ex)
-            //{
-            //    _logger.LogError(ex, "Bank  request failed with status {Status}", ex.StatusCode);
-
-            //    //503 status code has a distinct treatemnt
-            //    if (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-            //    {
-            //        return BuildResponse(Guid.Empty, request, lastFourInt, PaymentStatus.Rejected);
-            //    }
-
-            //    throw;
-            //}
-
-            //catch (Exception ex )
-            //{
-            //    _logger.LogError(ex, "Bank  request failed");
-
-            //    throw;
-            //}      
+     
         }
 
         private static BankRequest BuildBankRequest(ProcessPaymentRequest request)
@@ -95,7 +76,7 @@ namespace PaymentGateway.Api.Services
         }
 
         private static PostPaymentResponse BuildResponse(
-            Guid id,
+            Guid? id,
             ProcessPaymentRequest request,
             int lastFour,
             PaymentStatus status) => new()

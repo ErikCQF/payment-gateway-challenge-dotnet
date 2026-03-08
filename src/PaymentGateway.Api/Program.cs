@@ -37,7 +37,7 @@ builder.Services.AddHttpClient<IAcquiringBank, AcquiringBank>(client =>
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 //Payment Orchestrator: the Payment gateway
-builder.Services.AddSingleton<IPaymentGateway, PaymentGatewayService>();
+builder.Services.AddScoped<IPaymentGateway, PaymentGatewayService>();
 
 var app = builder.Build();
 
