@@ -43,9 +43,3 @@ Infrastructure/
 
 ---
 
-## Design Decisions & Assumptions
-
-### Validation
-Each field has its own rule class implementing `IValidateRule`. All rules run and all errors are collected before returning — the merchant receives every validation error in a single response, not just the first one.
-
----
