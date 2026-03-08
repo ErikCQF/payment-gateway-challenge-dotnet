@@ -59,7 +59,7 @@ public class PaymentsController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, nameof(ProcessPayment));
-            return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Bad Error :(" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { error = "An unexpected error occurred." });
         }
     }
 }
