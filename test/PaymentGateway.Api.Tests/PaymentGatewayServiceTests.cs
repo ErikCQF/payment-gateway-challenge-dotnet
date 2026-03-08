@@ -2,6 +2,7 @@
 
 using Moq;
 
+using PaymentGateway.Api.Infrastructure.Banks;
 using PaymentGateway.Api.Infrastructure.Repositories;
 using PaymentGateway.Api.Infrastructure.Validators;
 using PaymentGateway.Api.Models;

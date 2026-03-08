@@ -1,7 +1,7 @@
 ﻿using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
 
-namespace PaymentGateway.Api.Services
+namespace PaymentGateway.Api.Infrastructure.Banks
 {
     public class AcquiringBank : IAcquiringBank
     {
@@ -29,6 +29,12 @@ namespace PaymentGateway.Api.Services
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Bank simulator request failed with status {Status}", ex.StatusCode);
+                throw;
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Bank simulator request failed ");
                 throw;
             }
         }

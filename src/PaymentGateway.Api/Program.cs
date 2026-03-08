@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 using Microsoft.AspNetCore.Diagnostics;
 
+using PaymentGateway.Api.Infrastructure.Banks;
 using PaymentGateway.Api.Infrastructure.Helpers;
 using PaymentGateway.Api.Infrastructure.Repositories;
 using PaymentGateway.Api.Infrastructure.Validators;
@@ -12,11 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //From the spec it was requiring to export as Declined/Authorised/Rejected
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
