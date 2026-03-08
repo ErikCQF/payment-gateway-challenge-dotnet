@@ -15,24 +15,46 @@ docker-compose.yml - configures the bank simulator
 PaymentGateway.sln
 ```
 
+## Architecture
 
- Payment Gateway: Responsible for validating requests, storing card information and forwarding payment requests and accepting payment responses to and from the acquiring bank.
+The solution maps directly to the entities described in the spec:
 
-    Services/
-       PaymentGatewayService::IPaymentGateway
-     
- Acquiring Bank: Allows us to do the actual retrieval of money from the shopper’s card and pay out to the merchant. It also performs some validation of the card information and then sends the payment details to the  appropriate 3rd party organization for processing.
+**Payment Gateway** — validates requests, stores payment records, forwards to the acquiring bank.
+```
+Services/
+  PaymentGatewayService : IPaymentGateway
+```
 
-    Infrastructure/
-       Banks/
-           AcquiringBank::IAcquiringBank
+**Acquiring Bank** — called only when validation passes. Handles the actual payment processing.
+```
+Infrastructure/
+               Banks/
+                     AcquiringBank : IAcquiringBank
+```
+> `IAcquiringBank` is never called if validation has failed — this is a hard spec requirement.
 
+**Validator** — chain of responsibility pattern. Each rule is independent and isolated. To add a new rule, implement `IValidateRule` and register it in `Program.cs` — no other changes needed.
+```
+Infrastructure/
+              Validators/
+                         Rules/
+                               IValidateRule
+```
 
- **** Notice that it does not call IAcquiringBank if the validation has failed.
+---
 
- Validator: any new rule, just implement the interface
-   Infrastructure/
-       Validators/
-           Rules/
-             IValidateRule
+## Design Decisions & Assumptions
 
+### Validation
+Each field has its own rule class implementing `IValidateRule`. All rules run and all errors are collected before returning — the merchant receives every validation error in a single response, not just the first one.
+
+---
+
+## Tests
+
+| Test Class | Coverage |
+|---|---|
+| `ValidationRulesTests` | Each rule in isolation — boundary conditions, valid and invalid inputs |
+| `ValidatorServiceTests` | Service orchestration — all rules called, errors aggregated correctly |
+| `PaymentGatewayServiceTests` | Full flow with mocked bank — Authorized, Declined, rejected not persisted |
+| `PaymentsControllerTests` | HTTP layer — correct status codes |
