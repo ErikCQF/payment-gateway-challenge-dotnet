@@ -16,24 +16,23 @@ PaymentGateway.sln
 ```
 
 
-# Payment Gateway: Responsible for validating requests, storing card information and forwarding payment requests and accepting payment responses to and from the acquiring bank.
+ Payment Gateway: Responsible for validating requests, storing card information and forwarding payment requests and accepting payment responses to and from the acquiring bank.
 
-#    Services/
-#       PaymentGatewayService::IPaymentGateway
+    Services/
+       PaymentGatewayService::IPaymentGateway
      
-# Acquiring Bank: Allows us to do the actual retrieval of money from the shopper’s card and pay out to the merchant. It also performs some validation of the card information and then sends the payment details to the  appropriate 3rd party organization for processing.
+ Acquiring Bank: Allows us to do the actual retrieval of money from the shopper’s card and pay out to the merchant. It also performs some validation of the card information and then sends the payment details to the  appropriate 3rd party organization for processing.
 
-#    Infrastructure/
-#       Banks/
-#           AcquiringBank::IAcquiringBank
+    Infrastructure/
+       Banks/
+           AcquiringBank::IAcquiringBank
 
 
-# **** Notice that it does not call IAcquiringBank if the validation has failed.
+ **** Notice that it does not call IAcquiringBank if the validation has failed.
 
-# Validator: any new rule, just implement the interface
-#   Infrastructure/
-#       Validators/
-#           Rules/
-#             IValidateRule
-
+ Validator: any new rule, just implement the interface
+   Infrastructure/
+       Validators/
+           Rules/
+             IValidateRule
 
