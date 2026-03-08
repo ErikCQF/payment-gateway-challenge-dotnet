@@ -1,4 +1,6 @@
-﻿using PaymentGateway.Api.Models.Requests;
+﻿using System.Net;
+
+using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
 
 namespace PaymentGateway.Api.Infrastructure.Banks
@@ -19,6 +21,7 @@ namespace PaymentGateway.Api.Infrastructure.Banks
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("/payments", request, cancellationToken);
+
                 response.EnsureSuccessStatusCode();
 
                 var bankResponse = await response.Content.ReadFromJsonAsync<BankResponse>(cancellationToken: cancellationToken);
@@ -29,7 +32,7 @@ namespace PaymentGateway.Api.Infrastructure.Banks
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Bank simulator request failed with status {Status}", ex.StatusCode);
-                throw;
+                throw new BankUnavailableException(ex.StatusCode ?? HttpStatusCode.ServiceUnavailable, ex);
             }
 
             catch (Exception ex)

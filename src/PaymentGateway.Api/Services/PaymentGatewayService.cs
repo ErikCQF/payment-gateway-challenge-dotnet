@@ -32,30 +32,56 @@ namespace PaymentGateway.Api.Services
 
             var lastFourChars = request.CardNumber![^4..];
             int.TryParse(lastFourChars, out var lastFourInt);
-            var paymentId = Guid.NewGuid();
+
 
             var validation = _validatorService.Validate(request);
 
             if (!validation.IsValid)
             {
-                var invaliResponse = BuildResponse(paymentId, request, lastFourInt, PaymentStatus.Rejected);
-                _paymentsRepository.Add(invaliResponse);
+                //from spec: Rejected - No payment could be created as invalid information was supplied to the payment gateway
+                //and therefore it has rejected the request without calling the acquiring bank
+                //No need to save in the repository
+                return BuildResponse(Guid.Empty, request, lastFourInt, PaymentStatus.Rejected);
 
-                return invaliResponse;
             }
+
             BankRequest bankRequest = BuildBankRequest(request);
 
+            //try
+            //{
             var bankResponse = await _acquiringBank.ProcessPaymentAsync(bankRequest, cancellationToken);
 
             var status = bankResponse?.Authorized == true
                 ? PaymentStatus.Authorized
                 : PaymentStatus.Declined;
 
-            var response = BuildResponse(paymentId, request, lastFourInt, status);
+            var Id = Guid.NewGuid();
+
+            var response = BuildResponse(Id, request, lastFourInt, status);
 
             _paymentsRepository.Add(response);
 
             return response;
+            //}
+            //catch (HttpRequestException ex)
+            //{
+            //    _logger.LogError(ex, "Bank  request failed with status {Status}", ex.StatusCode);
+
+            //    //503 status code has a distinct treatemnt
+            //    if (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+            //    {
+            //        return BuildResponse(Guid.Empty, request, lastFourInt, PaymentStatus.Rejected);
+            //    }
+
+            //    throw;
+            //}
+
+            //catch (Exception ex )
+            //{
+            //    _logger.LogError(ex, "Bank  request failed");
+
+            //    throw;
+            //}      
         }
 
         private static BankRequest BuildBankRequest(ProcessPaymentRequest request)

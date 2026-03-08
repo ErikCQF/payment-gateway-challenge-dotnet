@@ -1,5 +1,4 @@
 ﻿using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Api.Models.Responses;
 
 namespace PaymentGateway.Api.Models
 {
@@ -23,9 +22,5 @@ namespace PaymentGateway.Api.Models
                 Cvv: request?.Cvv);
         }
 
-        public static BankResponse ToPostPaymentResponse(this PostPaymentResponse request)
-        {
-            return new BankResponse(request.Status == PaymentStatus.Authorized, request.Id.ToString());
-        }
     }
 }

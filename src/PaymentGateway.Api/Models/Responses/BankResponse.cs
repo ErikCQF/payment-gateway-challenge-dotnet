@@ -2,18 +2,7 @@
 
 namespace PaymentGateway.Api.Models.Responses
 {
-    public class BankResponse
-    {
-        [JsonPropertyName("authorized")]
-        public bool Authorized { get; }
-
-        [JsonPropertyName("authorization_code")]
-        public string? AuthorizationCode { get; }
-
-        public BankResponse(bool authorized, string? authorizationCode)
-        {
-            Authorized = authorized;
-            AuthorizationCode = authorizationCode;
-        }
-    }
+    public record BankResponse(
+        [property: JsonPropertyName("authorized")] bool Authorized,
+        [property: JsonPropertyName("authorization_code")] string? AuthorizationCode);
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+using PaymentGateway.Api.Infrastructure.Banks;
 using PaymentGateway.Api.Models;
 using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
@@ -29,18 +30,36 @@ public class PaymentsController : Controller
     {
         var payment = _paymentsRepository.Get(id);
 
+        if (payment == null)
+        {
+            return NotFound();
+        }
+
         return new OkObjectResult(payment);
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(BankResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BankResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<BankResponse?>> ProcessPayment([FromBody] PostPaymentRequestModel request,
+    [ProducesResponseType(typeof(PostPaymentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PostPaymentResponse), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<PostPaymentResponse?>> ProcessPayment([FromBody] PostPaymentRequestModel request,
                                                     CancellationToken cancellationToken)
     {
-        var result = await _paymentGateway.ProcessAsync(request.ToProcessPaymentRequest(), cancellationToken);
-        return result.Status == PaymentStatus.Rejected
-                ? UnprocessableEntity(result.ToPostPaymentResponse())
-                : Ok(result.ToPostPaymentResponse());
+        try
+        {
+            var result = await _paymentGateway.ProcessAsync(request.ToProcessPaymentRequest(), cancellationToken);
+            return result.Status == PaymentStatus.Rejected
+                    ? UnprocessableEntity(result)
+                    : Ok(result);
+        }
+        catch (BankUnavailableException ex)
+        {
+            _logger.LogError(ex, "Bank unavailable processing payment.http Status Code:{StatusCode} ", ex.StatusCode);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Bank unavailable processing payment" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, nameof(ProcessPayment));
+            return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Bad Error :(" });
+        }
     }
 }
