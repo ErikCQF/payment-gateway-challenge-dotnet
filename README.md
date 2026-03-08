@@ -49,12 +49,3 @@ Infrastructure/
 Each field has its own rule class implementing `IValidateRule`. All rules run and all errors are collected before returning — the merchant receives every validation error in a single response, not just the first one.
 
 ---
-
-## Tests
-
-| Test Class | Coverage |
-|---|---|
-| `ValidationRulesTests` | Each rule in isolation — boundary conditions, valid and invalid inputs |
-| `ValidatorServiceTests` | Service orchestration — all rules called, errors aggregated correctly |
-| `PaymentGatewayServiceTests` | Full flow with mocked bank — Authorized, Declined, rejected not persisted |
-| `PaymentsControllerTests` | HTTP layer — correct status codes |
