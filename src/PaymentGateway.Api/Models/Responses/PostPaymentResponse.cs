@@ -4,6 +4,7 @@ namespace PaymentGateway.Api.Models.Responses;
 
 public class PostPaymentResponse
 {
+    //TODO: Nullable or non nullable. Can Not be nullable for best, but sending guid empty to clients sounds an id already was created
     public Guid? Id { get; set; }
 
     //spec says status returned need be Rejected/Authorised/Declined
